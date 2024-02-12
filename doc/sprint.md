@@ -8,19 +8,28 @@
     Configuración del Entorno Virtual:
         - Abre una terminal o línea de comandos.
         - Crea un nuevo directorio para tu proyecto y navega a él.
-        - Ejecuta `python -m venv venv` para crear un entorno virtual llamado `venv`.
+        - Ejecuta `python3 -m venv venv` para crear un entorno virtual llamado `venv`.
     Activa el entorno virtual:
         - En Windows: **`.\venv\Scripts\activate`**
         - En macOS/Linux: **`source venv/bin/activate`**
     Instalación de Dependencias:
         - Instala las bibliotecas necesarias, como `nextcord`, utilizando el comando `pip install nextcord`.
-#### Configurar el repositorio en GitHub
+#### Configurar el repositorio en GitHub y GitIgnore
+    Configuración del Git:
+        - En la terminal:
+            git config --global user.name "Tu Nombre"
+            git config --global user.email "tu.email@example.com"
     Creación del Repositorio:
         - En GitHub: GitHub, iniciar sesión, repositories, add new.
     Inicializar el Repositorio Localmente:
         - En la terminal, dentro del directorio de tu proyecto, ejecutar git init para inicializar un nuevo repositorio de Git.
     Agregar el Repositorio Remoto:
         - Conectar repositorio local con el remoto usando git remote add origin URL_DEL_REPOSITORIO.
+    Creación de GitIgnore:
+        echo "venv/" > .gitignore
+        echo "*.db" >> .gitignore
+        echo "__pycache__/" >> .gitignore
+        echo ".vscode/" >> .gitignore
     Primer Commit y Push:
         - Agregar archivos al repositorio con git add ., luego un commit con git commit -m "Primer commit".
         - Subir cambios al repositorio remoto con git push -u origin master.    
