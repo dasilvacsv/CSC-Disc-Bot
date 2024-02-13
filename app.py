@@ -1,5 +1,7 @@
-import nextcord
-from nextcord.ext import commands
+import discord
+from discord.ext import commands
+from discord import Interaction, ButtonStyle
+from discord.ui import Button
 # Mapeo de sistema para encontrar carpetas raíces
 import os
 from dotenv import load_dotenv
@@ -9,15 +11,22 @@ load_dotenv()
 token = os.getenv('DISCORD_TOKEN')
 
 # Configuración de los intents del bot, necesaria
-intents = nextcord.Intents.default()
-intents = nextcord.Intents().all()
+intents = discord.Intents.default()
+intents = discord.Intents().all()
 # Instanciar el bot con los intents para ser llamado
 bot = commands.Bot(command_prefix='!', intents=intents)
 
-# Task 3 un comando que interactúe con el usuario
+
+# Task 3 Implementación de comandos con prefijos
 @bot.command()
 async def ping(ctx):
     await ctx.send('Pong!')
+
+# Task 3 Implementación de comandos con slash commands
+@bot.slash_command(name="saludo", description="Envía un saludo")
+async def saludo(interaction: Interaction):
+    await interaction.response.send_message("¡Hola, mundo!")
+
 
 # Task 4 Crear un evento que confirma que el bot está listo para empezar
 @bot.event

@@ -1,5 +1,5 @@
 # Dependencias a instalar
-pip install nextcord
+pip install py-cord
 pip install aiosqlite
 pip install python-dotenv
 Todo el registro se lleva en el task1 de sprint1
