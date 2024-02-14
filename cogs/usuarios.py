@@ -3,6 +3,7 @@ from discord.ext import commands
 from discord.ui import Button, View
 import datetime
 import aiosqlite
+import asyncio
 #Definicion de intents para Prefixed Commands
 intents = discord.Intents.all()
 
@@ -101,8 +102,14 @@ class CustomButton(Button): #Button Class
         for item in self.view.children:  # maneja la desactivación de los botones
             if isinstance(item, Button):    # maneja la desactivación de los botones
                 item.disabled = True    # maneja la desactivación de los botones
-
         await interaction.response.edit_message(view=self.view)
+
+        await asyncio.sleep(3)
+
+        for item in self.view.children:
+            if isinstance(item, Button):
+                item.disabled = False
+        await interaction.edit_original_response(view=self.view)
         
           # Retrieve the "Pending" role by its ID
         pending_role_id = "1207037302379909190"  # Replace with your actual "Pending" role ID
