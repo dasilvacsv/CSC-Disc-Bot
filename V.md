@@ -7,4 +7,6 @@ Sprint 2, notas en sprint.md y notion
 Bot funcional con eventos y comandos
 
 # commit 0.2
-proseguir con el avance del sprint 3
+investigación a fondo de componentes de py-cord
+utilización de cogs para arquitectura modular
+desarrollo del sprint 2 y definición de componentes a usar para desarrollar flujo de interacción e información

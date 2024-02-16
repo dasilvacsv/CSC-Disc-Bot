@@ -12,7 +12,6 @@ intents = discord.Intents.all()
 
 
 # Consulta para la búsqueda de batches
-
 async def autocomplete_batch_ids(ctx: discord.AutocompleteContext):
         user_id = str(ctx.interaction.user.id)
         batches = []
@@ -23,6 +22,7 @@ async def autocomplete_batch_ids(ctx: discord.AutocompleteContext):
                     batches.append(row[0])
         return [batch_id for batch_id in batches if ctx.value.lower() in batch_id.lower()]
 
+#Consulta para la busqueda de cuentas
 async def autocomplete_cuentas(ctx: discord.AutocompleteContext):
     cuentas = []
     async with aiosqlite.connect('main.db') as db:
@@ -42,9 +42,20 @@ class TransaccionesCog(commands.Cog):
     async def iniciar_ba(self, ctx):
         user_id = str(ctx.author.id)
         start_time = datetime.datetime.now().isoformat()
-        batch_id = str(uuid.uuid1())
 
         async with aiosqlite.connect('main.db') as db:
+            # Retrieve the last used number from the database
+            cursor = await db.execute("SELECT value FROM Counters WHERE name = 'batch_id'")
+            result = await cursor.fetchone()
+            if result is None:
+                # If the counter does not exist, create it with a value of 1
+                batch_id = "0000001"
+            else:
+                # If the counter exists, increment it and update the database
+                new_value = int(result[0]) + 1
+                batch_id = f"{new_value:07d}"
+                await db.execute("UPDATE Counters SET value = ? WHERE name = 'batch_id'", (new_value,))
+
             await db.execute('''INSERT INTO Batches (BatchID, UserID, StartTime, Status) 
                                 VALUES (?, ?, ?, 'Open')''', 
                              (batch_id, user_id, start_time))
@@ -52,10 +63,9 @@ class TransaccionesCog(commands.Cog):
 
         await ctx.respond(f"Batch {batch_id} iniciado por {ctx.author.mention}")
    
-   
     # Comando slash para cerrar un batch con opción
     @slash_command(name="cerrar_bach", description="Cierra un batch de transacciones.")
-    async def cerrar_bach(self, ctx, batch_id: Option(str, "ID del batch a cerrar", autocomplete=basic_autocomplete(autocomplete_batch_ids),), valor_liquidacion: float):
+    async def cerrar_bach(self, ctx, batch_id: Option(str, "ID del batch a cerrar", autocomplete=basic_autocomplete(autocomplete_batch_ids),), valor_liquidacion: float): #type: ignore
         total_transacciones = 0
         transacciones_liquidar = []
         async with aiosqlite.connect('main.db') as db:
@@ -74,7 +84,7 @@ class TransaccionesCog(commands.Cog):
             await ctx.respond(f"Batch {batch_id} cerrado correctamente.")
         
     @slash_command(name="estado_batch", description="Muestra el estado del batch.")
-    async def estado_batch(self, ctx, batch_id: Option(str, "ID del batch a cerrar", autocomplete=basic_autocomplete(autocomplete_batch_ids))):
+    async def estado_batch(self, ctx, batch_id: Option(str, "ID del batch a cerrar", autocomplete=basic_autocomplete(autocomplete_batch_ids))): #type: ignore
         transacciones = {'Pending': [], 'Completed': [], 'Cancelled': []}
         async with aiosqlite.connect('main.db') as db:
                 async with db.execute("SELECT * FROM Transactions WHERE BatchID = ?", (batch_id,)) as cursor:
@@ -83,7 +93,7 @@ class TransaccionesCog(commands.Cog):
                 print(transacciones)
 
     @slash_command(name="registrar", description="Registra una nueva transacción.")  
-    async def registrar_transaccion(self, ctx, monto: Option(int, "Monto de la transacción"), tasa: Option(int, "Tasa de conversión"), cuenta_entrada: Option(str, "Cuenta de entrada", autocomplete=basic_autocomplete(autocomplete_cuentas)), cuenta_salida: Option(str, "Cuenta de salida", autocomplete=basic_autocomplete(autocomplete_cuentas))):
+    async def registrar_transaccion(self, ctx, monto: Option(int, "Monto de la transacción"), tasa: Option(int, "Tasa de conversión"), cuenta_entrada: Option(str, "Cuenta de entrada", autocomplete=basic_autocomplete(autocomplete_cuentas)), cuenta_salida: Option(str, "Cuenta de salida", autocomplete=basic_autocomplete(autocomplete_cuentas))): #type: ignore
         user_id = ctx.author.id  # ID del usuario que ejecuta el comando
         total_salida = monto * tasa  # Cálculo del total en la cuenta de salida
 
