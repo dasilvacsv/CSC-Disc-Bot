@@ -41,7 +41,7 @@ class CuentasCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
 
-    @slash_command(name="cuent",  description="Cierra un batch de transacciones.")
+    @slash_command(name="cut",  description="Cierra un batch de transacciones.")
     @commands.has_role(1205983428001013770)  # O el ID del rol si no es un nombre
     
     async def registrar_cuenta(self, ctx, pais: Option(str, "Elige un país", autocomplete=basic_autocomplete(autocomplete_paises)), moneda: Option(str, "Elige una moneda", autocomplete=basic_autocomplete(autocomplete_moneda)), usuario: Option(str, "Elige un usuario", autocomplete=basic_autocomplete(autocomplete_usuarios)), nombre_cuenta: str, valor_inicial: float): #type: ignore
