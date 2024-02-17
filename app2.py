@@ -29,9 +29,9 @@ async def on_ready(): #async def to start a corroutine
 
 #Calling cogs to work with modules
 cogs_list = [
-    'cuentas',
     'transacciones',
-    'usuarios'
+    'usuarios',
+    'cuentas'
 ]
 
 for cog in cogs_list:

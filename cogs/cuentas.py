@@ -9,6 +9,7 @@ from discord.utils import basic_autocomplete
 #Definicion de intents para Prefixed Commands
 intents = discord.Intents.all()
 
+#Funcion de autocompletar monedas
 async def autocomplete_moneda(ctx: discord.AutocompleteContext):
     monedas = []
     async with aiosqlite.connect('main.db') as db:
@@ -17,6 +18,7 @@ async def autocomplete_moneda(ctx: discord.AutocompleteContext):
                 monedas.append(row[0])
     return [moneda for moneda in monedas if ctx.value.lower() in moneda.lower()]
 
+#Función de autocompletar paises
 async def autocomplete_paises(ctx: discord.AutocompleteContext):
     paises = []
     async with aiosqlite.connect('main.db') as db:
@@ -25,7 +27,7 @@ async def autocomplete_paises(ctx: discord.AutocompleteContext):
                 paises.append(row[0])
     return [paise for paise in paises if ctx.value.lower() in paise.lower()]
 
-
+#Función de autocompletar usuarios
 async def autocomplete_usuarios(ctx: discord.AutocompleteContext):
     usuarios = []
     async with aiosqlite.connect('main.db') as db:
@@ -34,6 +36,7 @@ async def autocomplete_usuarios(ctx: discord.AutocompleteContext):
                 usuarios.append(row[0])
     return [usuario for usuario in usuarios if ctx.value.lower() in usuario.lower()]
 
+#Clase de cuentascog
 class CuentasCog(commands.Cog):
     def __init__(self, bot):
         self.bot = bot
