@@ -11,30 +11,35 @@ from discord.commands import slash_command, Option
 intents = discord.Intents.all()
 
 class ApproveButton(Button):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, transaction_id, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
+        self.transaction_id = transaction_id
     async def callback(self, interaction: discord.Interaction):
         # Format the current timestamp
         await interaction.response.defer()
-        await interaction.followup.send("your request for the  role was accepted.", ephemeral=True)
-
+        async with aiosqlite.connect('main.db') as db:
+            await db.execute("UPDATE Transacciones SET Status = ? WHERE TransactionID = ?", ('Accepted', self.transaction_id))
+            await db.commit()
+        await interaction.followup.send(f"Your request for the {self.transaction_id} role was accepted.", ephemeral=True)
 
 class RejectButton(Button):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, transaction_id, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
+        self.transaction_id = transaction_id
     async def callback(self, interaction: discord.Interaction):
         # Format the current timestamp
         await interaction.response.defer()
-        await interaction.followup.send("your request for the  role was rejected.", ephemeral=True)
+        async with aiosqlite.connect('main.db') as db:
+            await db.execute("UPDATE Transacciones SET Status = ? WHERE TransactionID = ?", ('Rejected', self.transaction_id))
+            await db.commit()
+        await interaction.followup.send(f"your request for the {self.transaction_id} role was rejected.", ephemeral=True)
 
 class TransactionView(View):
-    def __init__(self):
+    def __init__(self, transaction_id):
         super().__init__()
 
-        approve_button = (ApproveButton(label="Realizada", style=discord.ButtonStyle.success))
-        reject_button = (RejectButton(label="Cancelada", style=discord.ButtonStyle.danger))
+        approve_button = (ApproveButton(transaction_id, label="Realizada", style=discord.ButtonStyle.success))
+        reject_button = (RejectButton(transaction_id, label="Cancelada", style=discord.ButtonStyle.danger))
 
         self.add_item(approve_button)
         self.add_item(reject_button)
@@ -113,7 +118,7 @@ class RegistroTransacciones(commands.Cog): # create a class for our cog that inh
         embed.add_field(name="Monto", value=str(self.monto), inline=True)
         embed.add_field(name="Tasa", value=str(timestamp), inline=True)
 
-        view = TransactionView()
+        view = TransactionView(transaction_id)
 
         await ctx.respond(embed=embed)
         await canal.send(embed=embed2, view=view)
