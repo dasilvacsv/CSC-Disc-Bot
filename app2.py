@@ -23,13 +23,16 @@ async def on_ready(): #async def to start a corroutine
 # @bot.event  # Correctly use the @bot.event decorator
 # async def on_member_join(member):  # Remove the 'self' parameter
 #    user_role_id = 1207029718927544400  # Replace this with your actual "User" role ID
-#     user_role = discord.utils.get(member.guild.roles, id=user_role_id)
+#     user_role = 
+# discord.utils.get(member.guild.roles, id=user_role_id)
 #    if user_role:
 #        await member.add_roles(user_role)
 
 #Calling cogs to work with modules
 cogs_list = [
     'usuarios',
+    'transacciones',
+    'cuentas',
     'trans'
 ]
 

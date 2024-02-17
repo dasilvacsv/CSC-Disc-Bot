@@ -16,11 +16,13 @@ class ApproveButton(Button):
         self.transaction_id = transaction_id
     async def callback(self, interaction: discord.Interaction):
         # Format the current timestamp
+        current_timestamp = datetime.datetime.now().isoformat()
         await interaction.response.defer()
         async with aiosqlite.connect('main.db') as db:
-            await db.execute("UPDATE Transacciones SET Status = ? WHERE TransactionID = ?", ('Accepted', self.transaction_id))
+            await db.execute("UPDATE Transacciones SET Status = ?, TimestampApproved = ? WHERE TransactionID = ?", ('Completed', current_timestamp, self.transaction_id))
             await db.commit()
         await interaction.followup.send(f"Your request for the {self.transaction_id} role was accepted.", ephemeral=True)
+
 
 class RejectButton(Button):
     def __init__(self, transaction_id, *args, **kwargs):
@@ -28,9 +30,10 @@ class RejectButton(Button):
         self.transaction_id = transaction_id
     async def callback(self, interaction: discord.Interaction):
         # Format the current timestamp
+        current_timestamp = datetime.datetime.now().isoformat()
         await interaction.response.defer()
         async with aiosqlite.connect('main.db') as db:
-            await db.execute("UPDATE Transacciones SET Status = ? WHERE TransactionID = ?", ('Rejected', self.transaction_id))
+            await db.execute("UPDATE Transacciones SET Status = ?, TimestampRejected = ? WHERE TransactionID = ?", ('Rejected', current_timestamp, self.transaction_id))
             await db.commit()
         await interaction.followup.send(f"your request for the {self.transaction_id} role was rejected.", ephemeral=True)
 
@@ -51,8 +54,8 @@ class RegistroTransacciones(commands.Cog): # create a class for our cog that inh
         self.bot = bot
         self.monto = None
         self.tasa = None
-
-    @slash_command(name="cet",  description="Cierra un batch de transacciones.")
+    
+    @slash_command(name="cat",  description="Cierra un batch de transacciones.")
     async def register(self, ctx, monto: float, tasa: float):
         canal = self.bot.get_channel(1207030045936197652)
         user_id = str(ctx.author.id)
@@ -121,10 +124,17 @@ class RegistroTransacciones(commands.Cog): # create a class for our cog that inh
         view = TransactionView(transaction_id)
 
         await ctx.respond(embed=embed)
-        await canal.send(embed=embed2, view=view)
 
 
+        # Obtener el canal y el miembro Cajero
+        transaction_queue_channel = self.bot.get_channel(1207153726239023175)  # Asegúrate de que el ID del canal es correcto
+        cajero_member = ctx.guild.get_member(1176991779208319016)  # Asegúrate de que el ID del miembro es correcto
 
+    # Enviar el embed al canal y al Cajero
+        await transaction_queue_channel.send(embed=embed2, view=view)
+        await cajero_member.send(embed=embed2)
+        await ctx.respond(f"Transacción {transaction_id} registrada en el batch {batch_id} por {ctx.author.mention}")
+    
 
 
 
